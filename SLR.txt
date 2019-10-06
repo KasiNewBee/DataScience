@@ -1,0 +1,71 @@
+#packages:MASS,ISLR
+Install.packages("MASS")
+Install.packages("ISLR")
+library(MASS)
+library(ISLR)
+#MASS package contains Boston data
+#*********************
+#1)Simple Linear Regression Set up
+ Viral=read.table(file="G:\\R Code files\\R Data Sets\\SLR-Viral Drug data.csv",header=T,sep=",")
+names(Viral)
+attach(Viral)
+#****************************
+#2) Simple Linear reggression
+
+SLR=lm(Viralcount~Drug)
+SLR
+summary(SLR)
+anova(SLR)
+names(SLR)
+
+SLR1=glm(Viralcount~Drug)# we can use glm ,it works same as lm if we don't mention the family
+#3) Accessing other values of SLR
+names(SLR)
+SLR$coefficients
+SLR$fitted.values
+predict(SLR) # Returns the predicted values
+SLR$residuals
+summary(SLR)$sigma
+residuals(SLR)
+influence(SLR)
+rstudent(SLR) 
+rstandard(SLR)
+hatvalues(SLR)
+which.max(hatvalues(SLR))
+#*******************************
+#4) Calculating Confidence Intervals for coef
+confint(SLR)#default alpha is 5%
+confint(SLR,level=.99)
+#*******************************
+#5)Calculating Confidence Intervals for mean response and new obsrvation
+predict(SLR,data.frame(Drug=c(10,15,16)),interval="confidence",level=.95)#Mean response prediction
+predict(SLR,data.frame(Drug=c(10,15,16)),interval="pred",level=.95)#individual response prediction
+#*******************************
+#6)Graphs
+plot(Drug,Viralcount,col=2,pch=20)
+abline(SLR,col=4,lwd=4)
+#*******************************
+#7) Residual plots
+#********************
+par(mfrow=c(2,2))
+#*******************
+qqnorm(residuals(SLR))
+qqline(residuals(SLR))
+#**********************
+plot(predict(SLR),rstudent(SLR))
+abline(h=c(-3,3))
+#*************************
+plot(residuals(SLR))
+lines(residuals(SLR))
+#**********************
+plot(SLR)
+par(mfrow=c(1,1))
+
+
+
+
+
+
+
+
+

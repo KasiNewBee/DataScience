@@ -1,0 +1,117 @@
+#Packages
+install.packages("car") # Partial Regression Plots and Boxtidwell
+install.packages("MASS")#Box Cox
+install.packages("qpcR")#To calculate PRESS Residual and PRESS Statistic
+install.packages("nortest") # Normality Test
+install.packages("e1071") # Normality Test
+install.packages("calibrate") # to add text in a plot
+library(car)
+library(MASS)
+library(qpcR)
+library(nortest)
+library(e1071)
+library(calibrate)
+
+
+#1)Data Set up
+Current=read.table(file="G:\\R Code files\\R Data Sets\\Windmill.csv",header=T,sep=",")
+names(Current)
+attach(Current)
+BOXCOX=read.table(file="G:\\R Code files\\R Data Sets\\BOXCOX.csv",header=T,sep=",")
+names(BOXCOX)
+attach(BOXCOX)
+WLS=read.table(file="G:\\R Code files\\R Data Sets\\WLS.csv",header=T,sep=",")
+names(WLS)
+attach(WLS)
+#2) SLR
+plot(WindVelocity,CurrentOutput,xlab="Wind Velocity",ylab="Current Output")
+SLR=lm(CurrentOutput~WindVelocity)
+SLR
+anova(SLR)
+summary(SLR)
+plot(SLR$fitted.values,SLR$residual,xlab="Yhat",ylab="Residual")
+Quadratic=lm(CurrentOutput~WindVelocity+I(WindVelocity^2))
+plot(Quadratic$fitted.values,Quadratic$residual,xlab="Yhat",ylab="Residual")# This will fail
+
+#3) Tranformation
+plot(1/WindVelocity,CurrentOutput,xlab="1/Wind Velocity",ylab="Current Output")
+Trans=lm(CurrentOutput~I(1/WindVelocity))
+Trans
+anova(Trans)
+summary(Trans)
+plot(Trans$fitted.values,rstandard(Trans),xlab="Yhat",ylab="ri",ylim=c(-3.5,3.5))
+abline(h=-3,col=2)
+abline(h=3,col=2)
+plot(Trans)
+
+#4) Residual plots
+#PRESS Residual and PRESS Statistic
+PRESS(Trans) # It provides PRESS Residuals,PRESS Statistic and Rsquare Prediction=P square
+PRESS.Residual=PRESS(Trans)$residuals
+PRESS.Residual
+#*************************
+Measures=influence.measures(Trans)
+Measures
+Measures$is.inf
+#*************************
+#Leverages
+hii=hatvalues(Trans)
+sum(hii)#Sum of hii=p
+plot(hii,main="Leverages")# hii>=2p/n is a leverage,p=no of parameters
+abline(h=2*2/25,col=2)
+textxy(1:length(hii),hii,labs = 1:length(hii))
+#**********************************
+#5) Analytical Method
+#Box-Tidwell:
+#Note1: Transformation  of predictor vaiable and H0:No tranformation is possible,H1:Tranaformation possible
+#Note2:X should be +ve and categorical predictor should not be transformed.
+boxtidwell=boxTidwell(CurrentOutput~WindVelocity) 
+#******************
+#Box-Cox Method
+#Note: Y should be +ve and if Y is -ve,then Jhonson transformation should be used.
+plot(EnergyUsage,Demand)
+Model=lm(Demand~EnergyUsage)
+plot(Model$fitted.values,Model$residuals,xlab="Yhat",ylab="Residual")
+boxtidwell=boxTidwell(Demand~EnergyUsage) 
+z=lm(Demand~I((EnergyUsage^1.5)))# Transforming X variable.But P is very high.So can not use this.
+boxcox(Demand~EnergyUsage,lambda=seq(-3,3,0.5),plotit=T)#lambda=0.5
+Trans=lm(I(Demand^0.5)~EnergyUsage)
+plot(Trans$fitted.values,Trans$residuals,xlab="Yhat-Trans",ylab="Residual")
+abline(h=-3,col=2)
+abline(h=3,col=2)
+Measures=influence.measures(Trans)
+Measures
+Measures$is.inf
+#*************************
+#6) Weighted Least Square Method
+plot(AdExpense,Income)
+Model=lm(Income~AdExpense)
+plot(Model$fitted.values,Model$residuals,xlab="Yhat",ylab="Residual")
+boxtidwell=boxTidwell(Income~AdExpense)
+boxtidwell
+boxcox=boxcox(Income~AdExpense,lambda=seq(-3,3,0.5),plotit=T)
+boxcox
+Trans=lm(Income~AdExpense)
+plot(Trans$fitted.values,Trans$residuals,xlab="Yhat-Trans",ylab="Residual")
+
+WLS1=lm(Income~AdExpense,weights =AdExpense^-1)
+plot(WLS1$fitted.values,rstandard(WLS1))
+WLS2=lm(Income~AdExpense,weights =AdExpense^-2)
+plot(WLS2$fitted.values,rstandard(WLS2))
+Measures1=influence.measures(WLS1)
+Measures1
+Measures1$is.inf
+Measures2=influence.measures(WLS2)
+Measures2
+Measures2$is.inf
+
+
+
+
+ 
+
+
+
+
+
+

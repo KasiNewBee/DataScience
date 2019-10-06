@@ -1,0 +1,103 @@
+#packages:MASS,ISLR,scatterplot3d
+install.packages("scatterplot3d")
+install.packages("MASS")
+install.packages("ISLR")
+install.packages("rgl")
+install.packages("Rcmdr")
+install.packages("ellipse")
+install.packages("car")# To test multicollinearity
+install.packages("multcomp") #To do multiple comparistion glth
+library(multcomp)
+library("rgl")
+library(MASS)
+library(ISLR)
+library(scatterplot3d)
+library(Rcmdr)
+library(ellipse)
+library(car)
+#*********************
+#1)Multiple Linear Regression Set up
+Delivery=read.table(file="G:\\R Code files\\R Data Sets\\MLR-Delivery Time.csv",header=T,sep=",")
+names(Delivery)
+attach(Delivery)
+#*****************
+
+#2) Multiple Linear reggression
+MLR=lm(DeliveryTime~Cases+Distance)
+MLR
+summary(MLR)
+anova(MLR)
+names(MLR)
+
+#3) Accessing other values of MLR
+names(MLR)
+MLR$coefficients
+MLR$fitted.values
+predict(MLR) # Returns the predicted values
+MLR$residuals
+summary(MLR)$sigma
+residuals(MLR)
+influence(MLR)
+rstudent(MLR) #R-Student (ti)
+rstandard(MLR)#Studentized (ri)
+hatvalues(MLR)
+which.max(hatvalues(MLR))
+summary(MLR)$coefficients[,1] # Accessing coef of intercept,Cases and Distance
+summary(MLR)$coefficients[,2] # Accessing Standard error intercept,Cases and Distance
+summary(MLR)$coefficients[1,2]# Accessing Standard error intercept
+summary(MLR)$coefficients[2,2]# Accessing Standard error Cases
+#*******************************
+#4)Extra sum of squares
+MLRfull=lm(DeliveryTime~Cases+Distance)
+MLRrest=lm(DeliveryTime~Cases)
+MLRESSQ=anova(MLRrest,MLRfull)
+
+#5) Calculating Confidence Intervals for coef
+confint(MLR)#default alpha is 5%
+confint(MLR,level=.99)
+#*******************************
+#6)Calculating Confidence Intervals for mean response and new obsrvation
+predict(MLR,data.frame(Cases=c(8,15,16),Distance=c(275,200,300)),interval="confidence",level=.95)#Mean response prediction
+predict(MLR,data.frame(Cases=c(8,15,16),Distance=c(275,200,300)),interval="pred",level=.95)#individual response prediction
+#*******************************
+#7)Graphs
+MLRPLOTa=scatterplot3d(Cases,Distance,DeliveryTime, pch=16, highlight.3d=TRUE,type="h", main="3D Scatterplot") #scatterplot3d
+MLRPLOTa$plane3d(MLR)
+plot3d(DeliveryTime,Cases,Distance, pch=16,col=2)#rgl package
+scatter3d(Cases,Distance,DeliveryTime)#Rcmdr package
+pairs(Delivery)
+par(mfrow=c(2,2))
+plot(MLR)
+
+#*******************************
+#8) Residual plots
+#********************
+par(mfrow=c(2,2))
+#*******************
+qqnorm(residuals(MLR))
+qqline(residuals(MLR))
+#**********************
+plot(predict(MLR),rstudent(MLR))
+
+#*************************
+plot(residuals(MLR))
+lines(residuals(MLR))
+#**********************
+plot(MLR)
+par(mfrow=c(1,1))
+#**********************
+
+#9)Simultaneous Confidence Intervals for Coeff 
+plot(ellipse(MLR,c("Cases","Distance"),level=.95),type="l",col=2,lwd=3)
+points(MLR$coefficients["Cases"],MLR$coefficients["Distance"],col=4,pch=20,cex=2)
+points(0,0,col=2)
+abline(v=c(summary(MLR)$coefficients[2,1]-(2.01*summary(MLR)$coefficients[2,2]),summary(MLR)$coefficients[2,1]+(2.01*summary(MLR)$coefficients[2,2])),lty=3,col=4,lwd=3)
+abline(h=c(summary(MLR)$coefficients[3,1]-(2.01*summary(MLR)$coefficients[3,2]),summary(MLR)$coefficients[3,1]+(2.01*summary(MLR)$coefficients[3,2])),lty=3,col=4,lwd=3)
+#**********************
+plot3d(ellipse3d(MLR,which=1:3,level = .95),col=3,aspect=T,alpha=.5)& Simulataneous confidence interval for all the coeff
+points3d(0,0,0,col=2,cex=3)
+#**********************
+#10)Multicollinearity
+vif(MLR)
+
+

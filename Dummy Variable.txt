@@ -1,0 +1,18 @@
+#Packages
+install.packages("multcomp") #To do multiple comparistion in anova/glth
+library(multcomp)
+require(mvtnorm)
+require(survival)
+require(TH.data)
+
+
+#1)Data Set up
+Origin=read.table(file="G:\\R Code files\\R Data Sets\\DummyVariable-Three.csv",header=T,sep=",")
+names(Origin)
+attach(Origin)
+Origin[,3]=as.factor(Origin[,3])
+
+#2)Creating a Regression Equation(a0+a1X+a2z1+a3Z2)
+DV3=lm(W~.,data=Origin)
+summary(DV3)
+#******************************

@@ -1,0 +1,133 @@
+#Packages:
+install.packages("leaps")
+library(leaps)
+
+
+#1)Data Set up
+Hald=read.table(file="G:\\R Code files\\R Data Sets\\BEST-Hald Cement data.csv",header=T,sep=",")
+attach(Hald)
+names(Hald)
+Hald
+#****************************************************
+#2)Building all possible regression equation
+APR=regsubsets(Y~X1+X2+X3+X4,data=Hald,nbest = 4)
+summary(APR)
+names(summary(APR))
+APR=regsubsets(Y~X1+X2+X3+X4,data=Hald,nbest = 1) # Consider this for rest of the analysis
+#****************************************************
+#Accessing other values of APR
+summary(APR)$which # Returns which X's are in the model as logical matrix
+summary(APR)$rsq # Return R square value 
+summary(APR)$rss # Returns SS res
+summary(APR)$adjr2 # Returns Adjusted r square
+summary(APR)$cp # Returns Adjusted Cp
+summary(APR)$bic  # Return Schwartz's information criterion
+#****************************************************
+#Model Summary
+Modelsummary=cbind(summary(APR)$which,R2=summary(APR)$rsq,SSres=summary(APR)$rss,AdjR2=summary(APR)$adjr2,Cp=summary(APR)$cp,BIC=summary(APR)$bic)
+ Modelsummary
+coef(APR,c(1,2,3,4))
+#****************************************************
+#Graphs
+plot(APR,scale="r2")
+plot(APR,scale="adjr2")
+plot(APR,scale="Cp")
+plot(APR,scale="bic")
+plot(summary(APR)$rsq,type="b")
+plot(summary(APR)$rss,type="b")
+plot(summary(APR)$adjr2,type="b")
+plot(summary(APR)$cp,type="b")
+plot(summary(APR)$bic,type="b")
+#****************************************************
+#3)Backward elimination
+BER=regsubsets(Y~X1+X2+X3+X4,data=Hald,method="backward")
+summary(BER)
+#****************************************************
+#Accessing other values of BER
+summary(BER)$which # Returns which X's are in the model as logical matrix
+summary(BER)$rsq # Return R square value 
+summary(BER)$rss # Returns SS res
+summary(BER)$adjr2 # Returns Adjusted r square
+summary(BER)$cp # Returns Adjusted Cp
+summary(BER)$bic  # Return Schwartz's information criterion
+#****************************************************
+#Model Summary
+Modelsummary=cbind(summary(BER)$which,R2=summary(BER)$rsq,SSres=summary(BER)$rss,AdjR2=summary(BER)$adjr2,Cp=summary(BER)$cp,BIC=summary(BER)$bic)
+ Modelsummary
+coef(BER,c(1,2,3,4))
+#****************************************************
+#Graphs
+plot(BER,scale="r2")
+plot(BER,scale="adjr2")
+plot(BER,scale="Cp")
+plot(BER,scale="bic")
+plot(summary(BER)$rsq)
+plot(summary(BER)$rss,type="b")
+plot(summary(BER)$adjr2,type="b")
+plot(summary(BER)$cp,type="b")
+plot(summary(BER)$bic,type="b")
+#****************************************************
+#4)Forward Selection
+FSR=regsubsets(Y~X1+X2+X3+X4,data=Hald,method="forward",nbest=16)
+summary(FSR)
+FSR=regsubsets(Y~X1+X2+X3+X4,data=Hald,method="forward",nbest=1)# Consider this for further analysis
+#****************************************************
+#Accessing other values of FSR
+summary(FSR)$which # Returns which X's are in the model as logical matrix
+summary(FSR)$rsq # Return R square value 
+summary(FSR)$rss # Returns SS res
+summary(FSR)$adjr2 # Returns Adjusted r square
+summary(FSR)$cp # Returns Adjusted Cp
+summary(FSR)$bic  # Return Schwartz's information criterion
+#****************************************************
+#Model Summary
+Modelsummary=cbind(summary(FSR)$which,R2=summary(FSR)$rsq,SSres=summary(FSR)$rss,AdjR2=summary(FSR)$adjr2,Cp=summary(FSR)$cp,BIC=summary(FSR)$bic)
+ Modelsummary
+coef(FSR,c(2,3,4,5))
+#****************************************************
+#Graphs
+plot(FSR,scale="r2")
+plot(FSR,scale="adjr2")
+plot(FSR,scale="Cp")
+plot(FSR,scale="bic")
+plot(summary(FSR)$rsq)
+plot(summary(FSR)$rss,type="b")
+plot(summary(FSR)$adjr2,type="b")
+plot(summary(FSR)$cp,type="b")
+plot(summary(FSR)$bic,type="b")
+#****************************************************
+#5) Stepwise Regression
+SWR=regsubsets(Y~X1+X2+X3+X4,data=Hald,method="seqrep",nbest=1)
+summary(SWR)
+#****************************************************
+#Accessing other values of SWR
+summary(SWR)$which # Returns which X's are in the model as logical matrix
+summary(SWR)$rsq # Return R square value 
+summary(SWR)$rss # Returns SS res
+summary(SWR)$adjr2 # Returns Adjusted r square
+summary(SWR)$cp # Returns Adjusted Cp
+summary(SWR)$bic  # Return Schwartz's information criterion
+#****************************************************
+#Model Summary
+Modelsummary=cbind(summary(SWR)$which,R2=summary(SWR)$rsq,SSres=summary(SWR)$rss,AdjR2=summary(SWR)$adjr2,Cp=summary(SWR)$cp,BIC=summary(SWR)$bic)
+Modelsummary
+coef(SWR,c(2,3,4,5))
+#****************************************************
+#Graphs
+plot(SWR,scale="r2")
+plot(SWR,scale="adjr2")
+plot(SWR,scale="Cp")
+plot(SWR,scale="bic")
+plot(summary(SWR)$rsq)
+plot(summary(SWR)$rss,type="b")
+plot(summary(SWR)$adjr2,type="b")
+plot(summary(SWR)$cp,type="b")
+plot(summary(SWR)$bic,type="b")
+#****************************************************
+
+
+
+
+
+
+

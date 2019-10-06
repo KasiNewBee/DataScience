@@ -1,0 +1,34 @@
+#Packages:
+install.packages("qpcR")#To calculate PRESS Residual and PRESS Statistic
+install.packages(car)# To test multicollinearity
+library(qpcR)
+library(car)
+
+#1)Data Set up
+Conversion=read.table(file="G:\\R Code files\\R Data Sets\\Poly-one.csv",header=T,sep=",")
+names(Conversion)
+attach(Conversion)
+
+#2)Building quadratic Regression without centering
+polyone=lm(TensileStrength~Concentration+I(Concentration^2),data=Conversion)
+summary(polyone)
+anova(polyone)
+vif(polyone)
+
+#3) Centering of data
+Conversion[,1]=scale(Concentration,center = T,scale = T)
+plot(Concentration,TensileStrength)
+
+#4)Building quadratic Regression with cntering
+polyone=lm(TensileStrength~Concentration+I(Concentration^2),data=Conversion)
+summary(polyone)
+anova(polyone)
+vif(polyone)
+# PRESS Residual and PRESS Statistic
+PRESS(polyone) # It provides PRESS Residuals,PRESS Statistic and Rsquare Prediction=P square
+PRESS.Residual=PRESS(polyone)$residuals
+PRESS.Residual
+
+
+
+
